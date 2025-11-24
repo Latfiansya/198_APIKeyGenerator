@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Cek API Key</title>
+</head>
+<body>
+
+    <h1>Cek API Key</h1>
+
+    <label>Masukkan API Key:</label><br>
+    <input id="apiKey" type="text"><br><br>
+
+    <button id="cekBtn">Cek API</button>
+
+    <pre id="result"></pre>
+
+<script>
+document.getElementById('cekBtn').addEventListener('click', async () => {
+    const apiKey = document.getElementById('apiKey').value.trim();
+
+    if (!apiKey) {
+        alert("API key wajib diisi.");
+        return;
+    }
+
+    const res = await fetch('/cekapi', {
+        method: 'POST',
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ apiKey })
+    });
+
+    const data = await res.json();
+    document.getElementById('result').textContent = JSON.stringify(data, null, 2);
+});
+</script>
+
+</body>
+</html>

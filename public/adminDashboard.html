@@ -3,17 +3,22 @@
 <body>
     <h2>Admin Dashboard</h2>
 
-    <button id="loadBtn">Load User Data</button>
+    <button id="loadBtn">Load Data User</button>
 
     <pre id="output"></pre>
 
 <script>
-document.getElementById('loadBtn').addEventListener('click', async () => {
+async function loadData() {
     const res = await fetch('/admin/dashboard');
     const data = await res.json();
     document.getElementById('output').textContent =
         JSON.stringify(data, null, 2);
-});
+    }
+
+// otomatis load saat halaman dibuka
+window.onload = loadData;
+
+document.getElementById('loadBtn').addEventListener('click', loadData);
 </script>
 </body>
 </html>

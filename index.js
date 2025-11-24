@@ -229,6 +229,10 @@ app.get('/admin/dashboard-page', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'adminDashboard.html'));
 });
 
+//Route Halaman Cek API
+app.get('/checkApi', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'checkAPI.html'));
+});
 
 // Jalankan server 
 app.listen(PORT, () => {
