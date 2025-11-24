@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <h2>Admin Dashboard</h2>
+
+    <button id="loadBtn">Load User Data</button>
+
+    <pre id="output"></pre>
+
+<script>
+document.getElementById('loadBtn').addEventListener('click', async () => {
+    const res = await fetch('/admin/dashboard');
+    const data = await res.json();
+    document.getElementById('output').textContent =
+        JSON.stringify(data, null, 2);
+});
+</script>
+</body>
+</html>

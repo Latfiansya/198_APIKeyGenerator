@@ -3,7 +3,7 @@ const express = require('express');
 const path = require('path');
 const crypto = require('crypto');
 const sqlite3 = require('sqlite3').verbose();
-const bcrypt = require('bcrypt');
+const hashPassword = require('./middleware/hashPassword');
 const app = express();
 
 const PORT = 3000;
@@ -65,14 +65,13 @@ app.get('/', (req, res) => {
 
 
 // ADMIN REGISTER
-app.post('/admin/register', async (req, res) => {
-  const { email, password } = req.body;
-
-  const hash = await bcrypt.hash(password, 10);
+app.post('/admin/register', hashPassword, (req, res) => {
+  const { email } = req.body;
+  const hashedPassword = req.hashedPassword;
 
   db.run(
     `INSERT INTO admin (email, password) VALUES (?, ?)`,
-    [email, hash],
+    [email, hashedPassword],
     (err) => {
       if (err) {
         return res.status(500).json({ success: false, message: "Gagal daftar admin." });
@@ -210,6 +209,23 @@ app.post('/user/save', (req, res) => {
     );
   });
 });
+
+
+//Route Halaman Admin
+app.get('/admin/register', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'adminRegister.html'));
+});
+
+//Route Halaman Login Admin
+app.get('/admin/login', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'adminLogin.html'));
+});
+
+//Route Halaman Dashboard Admin
+app.get('/admin/dashboard-page', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'adminDashboard.html'));
+});
+
 
 // Jalankan server 
 app.listen(PORT, () => {

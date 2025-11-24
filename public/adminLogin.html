@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<body>
+  <h2>Admin Login</h2>
+
+  <form id="loginForm">
+    <label>Email:</label><br>
+    <input id="email" type="email"><br><br>
+
+    <label>Password:</label><br>
+    <input id="password" type="password"><br><br>
+
+    <button type="submit">Login</button>
+    </form>
+
+    <pre id="result"></pre>
+
+    <script>
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value.trim();
+
+    const res = await fetch('/admin/login', {
+        method: 'POST',
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({ email, password })
+    });
+
+    const data = await res.json();
+    document.getElementById('result').textContent = JSON.stringify(data, null, 2);
+
+    if (data.success) window.location.href = "/adminDashboard.html";
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <h2>Admin Register</h2>
+
+    <form id="registerForm">
+        <label>Email:</label><br>
+        <input id="email" type="email"><br><br>
+
+        <label>Password:</label><br>
+        <input id="password" type="password"><br><br>
+
+        <button type="submit">Register</button>
+    </form>
+
+    <pre id="result"></pre>
+
+    <script>
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value.trim();
+
+    const res = await fetch('/admin/register', {
+        method: 'POST',
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({ email, password })
+    });
+
+    const data = await res.json();
+    document.getElementById('result').textContent = JSON.stringify(data, null, 2);
+});
+</script>
+</body>
+</html>
