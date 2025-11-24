@@ -9,7 +9,7 @@ const app = express();
 const PORT = 3000;
 
 // --- Inisialisasi Database SQLite ---
-const db = new sqlite3.Database('./apikeys.db', (err) => {
+const db = new sqlite3.Database('./apiKeys.db', (err) => {
   if (err) console.error('Gagal konek database:', err);
   else console.log('Terkoneksi ke database SQLite.');
 });
@@ -55,18 +55,16 @@ db.run(`
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 
-// ================================
+
 // ROUTES
-// ================================
 
 // Halaman utama
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// -----------------------
+
 // ADMIN REGISTER
-// -----------------------
 app.post('/admin/register', async (req, res) => {
   const { email, password } = req.body;
 
@@ -84,9 +82,8 @@ app.post('/admin/register', async (req, res) => {
   );
 });
 
-// -----------------------
+
 // ADMIN LOGIN
-// -----------------------
 app.post('/admin/login', (req, res) => {
   const { email, password } = req.body;
 
@@ -100,9 +97,8 @@ app.post('/admin/login', (req, res) => {
   });
 });
 
-// -----------------------
+
 // ADMIN DASHBOARD
-// -----------------------
 app.get('/admin/dashboard', (req, res) => {
   const sql = `
     SELECT u.firstName, u.lastName, u.email, k.key,
@@ -126,9 +122,8 @@ app.get('/admin/dashboard', (req, res) => {
   });
 });
 
-// -----------------------
+
 // GENERATE API KEY
-// -----------------------
 app.post('/create', (req, res) => {
   try {
     const randomKey = 'sk-' + crypto.randomBytes(24).toString('base64url');
@@ -153,9 +148,8 @@ app.post('/create', (req, res) => {
   }
 });
 
-// -----------------------
+
 // CHECK API KEY
-// -----------------------
 app.post('/cekapi', (req, res) => {
   const { apiKey } = req.body;
   if (!apiKey) {
@@ -177,9 +171,8 @@ app.post('/cekapi', (req, res) => {
   });
 });
 
-// -----------------------
+
 // SIMPAN USER
-// -----------------------
 app.post('/user/save', (req, res) => {
   const { firstName, lastName, email, apiKey } = req.body;
 
@@ -218,7 +211,7 @@ app.post('/user/save', (req, res) => {
   });
 });
 
-// --- Jalankan server ---
+// Jalankan server 
 app.listen(PORT, () => {
   console.log(`Server berjalan di http://localhost:${PORT}`);
 });
