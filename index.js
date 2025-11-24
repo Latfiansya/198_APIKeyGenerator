@@ -160,76 +160,49 @@ app.post('/cekapi', (req, res) => {
 });
 
 // Route untuk menyimpan data user (wajib punya API key yang valid)
-app.post('/register', (req, res) => {
-  const { apiKey, firstName, lastName, email } = req.body;
+app.post('/user/save', (req, res) => {
+  const { firstName, lastName, email, apiKey } = req.body;
 
-  // Validasi input dasar
-  if (!apiKey || !firstName || !lastName || !email) {
+  if (!apiKey) {
     return res.status(400).json({
       success: false,
-      message: 'Semua field harus diisi.'
+      message: "Harus generate API key terlebih dahulu."
     });
   }
 
-  // Cek apakah API key valid
-  db.get(`SELECT id FROM api_keys WHERE key = ?`, [apiKey], (err, apiRow) => {
-    if (err) {
-      console.error('Error cek API key:', err);
-      return res.status(500).json({ success: false, message: 'Kesalahan server.' });
-    }
-
-    if (!apiRow) {
-      return res.status(401).json({
+  // Ambil id api_key dari tabel api_keys
+  db.get(`SELECT id FROM api_keys WHERE key = ?`, [apiKey], (err, row) => {
+    if (err || !row) {
+      return res.status(400).json({
         success: false,
-        message: 'API key tidak valid.'
+        message: "API key tidak ditemukan di database."
       });
     }
 
-    const apiKeyId = apiRow.id;
+    const apiKeyId = row.id;
 
-app.post('/user/save', (req, res) => {
-    const { firstName, lastName, email, apiKey } = req.body;
-
-    if (!apiKey) {
-        return res.status(400).json({
+    db.run(
+      `INSERT INTO user (firstName, lastName, email, api_key_id)
+       VALUES (?, ?, ?, ?)`,
+      [firstName, lastName, email, apiKeyId],
+      function (err) {
+        if (err) {
+          console.error(err);
+          return res.status(500).json({
             success: false,
-            message: "Harus generate API key terlebih dahulu."
-        });
-    }
-
-    // Ambil id api_key dari tabel api_keys
-    db.get(`SELECT id FROM api_keys WHERE key = ?`, [apiKey], (err, row) => {
-        if (err || !row) {
-            return res.status(400).json({
-                success: false,
-                message: "API key tidak ditemukan di database."
-            });
+            message: "Gagal menyimpan data user."
+          });
         }
 
-        const apiKeyId = row.id;
-
-        // Simpan data user
-        db.run(
-            `INSERT INTO user (firstName, lastName, email, api_key_id)
-              VALUES (?, ?, ?, ?)`,
-            [firstName, lastName, email, apiKeyId],
-            function(err) {
-                if (err) {
-                    console.error(err);
-                    return res.status(500).json({
-                        success: false,
-                        message: "Gagal menyimpan data user."
-                    });
-                }
-
-                return res.status(200).json({
-                    success: true,
-                    message: "User berhasil disimpan!"
-                });
-            }
-        );
-    });
+        return res.status(200).json({
+          success: true,
+          message: "User berhasil disimpan!"
+        });
+      }
+    );
+  });
 });
+
 
 
 // --- Jalankan server ---
