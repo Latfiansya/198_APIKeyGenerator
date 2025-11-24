@@ -4,41 +4,49 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Generate API Key</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
+    <div class="card">
+        
+        <div class="top-action">
+            <a href="/checkApi">Cek API &rarr;</a>
+        </div>
 
-    <!-- Tombol cek API di pojok kanan atas -->
-    <div style="position: absolute; top: 10px; right: 10px;">
-        <a href="/checkApi" id="cekApiBtn">Cek API</a>
+        <h1>Praktikum PWS</h1>
+        <p style="text-align: center;">Generate your access key below</p>
+
+        <label>API Key Generated</label>
+        <div class="api-key-wrapper">
+            <div id="apiKeyText" class="api-key-display">Click generate below...</div>
+            
+            <button id="copyBtn" class="copy-btn-icon" title="Copy to Clipboard">
+                <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+            </button>
+        </div>
+
+        <button id="generateBtn">Generate New API Key</button>
+        <p id="message" style="text-align:center; margin-top:10px; font-size:13px; min-height:20px;"></p>
+
+        <hr>
+
+        <h2>User Profile</h2>
+        <p style="text-align: center; margin-bottom: 20px;">Save your details to activate the key</p>
+
+        <form id="userForm">
+            <label>First Name</label>
+            <input id="firstName" type="text" placeholder="John">
+
+            <label>Last Name</label>
+            <input id="lastName" type="text" placeholder="Appleseed">
+
+            <label>Email Address</label>
+            <input id="email" type="email" placeholder="john@icloud.com">
+
+            <button id="saveBtn" type="button" disabled>Save User Data</button>
+        </form>
     </div>
-
-    <h1>Generate API Key</h1>
-
-    <div>
-        <p>API Key:</p>
-        <pre id="apiKeyText">Belum ada API key</pre>
-        <button id="copyBtn">Copy</button>
-    </div>
-
-    <button id="generateBtn">Generate API Key</button>
-
-    <p id="message"></p>
-
-    <hr>
-
-    <h2>Data User</h2>
-
-    <label>First Name</label><br>
-    <input id="firstName" type="text"><br><br>
-
-    <label>Last Name</label><br>
-    <input id="lastName" type="text"><br><br>
-
-    <label>Email</label><br>
-    <input id="email" type="email"><br><br>
-
-    <button id="saveBtn" disabled>Save User</button>
 
     <script>
         const generateBtn = document.getElementById('generateBtn');
@@ -49,9 +57,12 @@
 
         let currentApiKey = null;
 
-        // 1. Generate API KEY dari backend
         generateBtn.addEventListener('click', async () => {
             try {
+                // Efek loading
+                generateBtn.textContent = "Generating...";
+                generateBtn.disabled = true;
+
                 const res = await fetch('/create', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -59,30 +70,42 @@
                 });
 
                 const data = await res.json();
+                generateBtn.textContent = "Generate New API Key";
+                generateBtn.disabled = false;
+
                 if (!data.success) {
-                    alert(data.message);
+                    message.textContent = data.message;
+                    message.style.color = "red";
                     return;
                 }
 
                 currentApiKey = data.apiKey;
                 apiKeyText.textContent = currentApiKey;
+                apiKeyText.style.color = "#1d1d1f"; // Make text darker indicating active
 
                 saveBtn.disabled = false;
-
                 message.textContent = data.message;
+                message.style.color = "green";
+
             } catch (err) {
+                generateBtn.textContent = "Generate New API Key";
+                generateBtn.disabled = false;
                 alert('Gagal generate API key.');
             }
         });
 
-        // 2. Copy ke clipboard
         copyBtn.addEventListener('click', async () => {
             if (!currentApiKey) return;
             await navigator.clipboard.writeText(currentApiKey);
-            alert('Copied!');
+            
+            // Visual feedback kecil
+            const originalIcon = copyBtn.innerHTML;
+            copyBtn.innerHTML = `<svg viewBox="0 0 24 24"><path fill="#34C759" d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>`;
+            setTimeout(() => {
+                copyBtn.innerHTML = originalIcon;
+            }, 2000);
         });
 
-        // 3. Save user
         saveBtn.addEventListener('click', async () => {
             const firstName = document.getElementById('firstName').value.trim();
             const lastName = document.getElementById('lastName').value.trim();
@@ -113,8 +136,6 @@
 
             alert("User berhasil disimpan!");
         });
-
     </script>
-
 </body>
 </html>

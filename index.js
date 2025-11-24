@@ -142,7 +142,7 @@ app.post('/create', (req, res) => {
       res.json({
         success: true,
         apiKey: randomKey,
-        message: 'API key berhasil digenerate dan disimpan ke database!'
+        message: 'API key successfully generated and saved to database!'
       });
     });
   } catch (err) {
@@ -166,10 +166,10 @@ app.post('/cekapi', (req, res) => {
 
     if (row) {
       db.run(`INSERT INTO api_usage_log (api_key_id) VALUES (?)`, [row.id]);
-      return res.json({ success: true, message: 'API key valid.' });
+      return res.json({ success: true, message: 'API Key valid.' });
     }
 
-    res.status(401).json({ success: false, message: 'API key tidak valid.' });
+    res.status(401).json({ success: false, message: 'Invalid API Key' });
   });
 });
 

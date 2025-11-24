@@ -1,0 +1,336 @@
+/* RESET & VARIABLES */
+:root {
+    --primary-color: #0071e3; /* Apple System Blue */
+    --primary-hover: #0077ed;
+    --bg-color: #f5f5f7; /* Light Grey Background khas Apple */
+    --card-bg: #ffffff;
+    --text-main: #1d1d1f;
+    --text-secondary: #86868b;
+    --border-color: #d2d2d7;
+    --radius-card: 24px;
+    --radius-input: 12px;
+    --radius-btn: 980px; /* Pill shape */
+    --shadow: 0 10px 40px -10px rgba(0,0,0,0.1);
+    --font-stack: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-stack);
+    -webkit-font-smoothing: antialiased;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+/* CARD CONTAINER (Untuk membuat konten rata tengah & elegan) */
+.card {
+    background: var(--card-bg);
+    width: 100%;
+    max-width: 460px;
+    padding: 48px 40px;
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow);
+    text-align: center;
+    position: relative;
+    animation: fadeIn 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* TYPOGRAPHY */
+h1, h2 {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--text-main);
+    letter-spacing: -0.01em;
+}
+
+p, label {
+    font-size: 15px;
+    color: var(--text-secondary);
+    margin-bottom: 24px;
+    display: block;
+    text-align: left; /* Label form lebih enak dilihat rata kiri */
+}
+
+label {
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: var(--text-main);
+    margin-top: 16px;
+}
+
+/* LINKS */
+a {
+    text-decoration: none;
+    color: var(--primary-color);
+    font-size: 14px;
+    font-weight: 500;
+    transition: opacity 0.2s;
+}
+a:hover {
+    opacity: 0.7;
+    text-decoration: underline;
+}
+
+/* FORMS & INPUTS */
+input {
+    width: 100%;
+    height: 48px;
+    padding: 0 16px;
+    font-size: 17px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-input);
+    background-color: rgba(255,255,255,0.8);
+    transition: all 0.2s ease;
+    margin-bottom: 4px; /* Jarak kecil sebelum label berikutnya */
+}
+
+input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.15);
+    outline: none;
+}
+
+/* BUTTONS */
+button {
+    width: 100%;
+    height: 48px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: var(--radius-btn);
+    font-size: 17px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 24px;
+    transition: transform 0.1s, background-color 0.2s;
+}
+
+button:hover {
+    background-color: var(--primary-hover);
+}
+
+button:active {
+    transform: scale(0.98);
+}
+
+button:disabled {
+    background-color: var(--border-color);
+    cursor: not-allowed;
+}
+
+/* UTILITY: JSON OUTPUT / PRE */
+pre {
+    background: #f5f5f7;
+    padding: 16px;
+    border-radius: 12px;
+    text-align: left;
+    font-family: "SF Mono", "Menlo", monospace;
+    font-size: 13px;
+    color: #333;
+    margin-top: 20px;
+    overflow-x: auto;
+    border: 1px solid rgba(0,0,0,0.05);
+    white-space: pre-wrap; /* Agar wrap di mobile */
+}
+
+/* SPECIAL: API KEY INPUT GROUP (Untuk Index.html) */
+.api-key-wrapper {
+    position: relative;
+    margin-bottom: 24px;
+    text-align: left;
+}
+
+.api-key-display {
+    background: #f5f5f7;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-input);
+    padding: 14px 16px;
+    padding-right: 50px; /* Space untuk tombol copy */
+    font-family: "SF Mono", monospace;
+    font-size: 15px;
+    color: var(--text-main);
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+.copy-btn-icon {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 36px;
+    height: 36px;
+    background: transparent;
+    color: var(--primary-color);
+    margin: 0;
+    padding: 0;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.copy-btn-icon:hover {
+    background: rgba(0, 113, 227, 0.1);
+}
+
+.copy-btn-icon svg {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+}
+
+/* HEADER ACTIONS (Top Right Link) */
+.top-action {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+}
+
+/* DIVIDER */
+hr {
+    border: 0;
+    height: 1px;
+    background: var(--border-color);
+    margin: 32px 0;
+}
+
+/* ANIMATIONS */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- TABLE STYLES (Admin Dashboard) --- */
+.table-wrapper {
+    overflow-x: auto;
+    margin-top: 24px;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 600px;
+    background: white;
+}
+
+th {
+    /* FIX: Rata Tengah Header */
+    text-align: center; 
+    padding: 14px 16px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    background: #fafafa;
+    border-bottom: 1px solid var(--border-color);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+td {
+    /* FIX: Rata Tengah Data */
+    text-align: center;
+    padding: 14px 16px;
+    font-size: 15px;
+    border-bottom: 1px solid var(--border-color);
+    vertical-align: middle;
+}
+
+tr:last-child td {
+    border-bottom: none;
+}
+
+tr:hover td {
+    background-color: #f5f5f7;
+}
+
+/* Badge Status */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.badge-online { background-color: rgba(52, 199, 89, 0.15); color: #1c7c37; }
+.badge-offline { background-color: rgba(142, 142, 147, 0.15); color: #636366; }
+
+.code-cell {
+    font-family: "SF Mono", monospace;
+    font-size: 13px;
+    color: #555;
+    background: #f0f0f0;
+    padding: 4px 8px;
+    border-radius: 6px;
+    display: inline-block;
+    max-width: 180px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* --- FORM FIX (Login & Register) --- */
+/* Menggunakan Flexbox agar input PASTI turun ke bawah */
+form {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    width: 100%;
+}
+
+form label {
+    margin-top: 16px;
+    margin-bottom: 8px;
+}
+
+form input {
+    width: 100%;
+}
+
+/* --- STATUS MESSAGE (Tanpa Icon Besar) --- */
+.status-card {
+    margin-top: 24px;
+    padding: 16px;
+    border-radius: 12px;
+    text-align: center; /* Teks rata tengah */
+    font-size: 15px;
+    font-weight: 600;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s ease-out;
+}
+
+.status-card.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.status-success {
+    background-color: #d1fae5; /* Hijau muda segar */
+    color: #065f46;
+    border: 1px solid #a7f3d0;
+}
+
+.status-error {
+    background-color: #fee2e2; /* Merah muda lembut */
+    color: #991b1b;
+    border: 1px solid #fecaca;
+}

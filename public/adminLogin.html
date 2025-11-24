@@ -1,38 +1,58 @@
 <!DOCTYPE html>
 <html>
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Login</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
 <body>
-  <h2>Admin Login</h2>
+    <div class="card">
+        <h2>Admin Login</h2>
+        <p style="text-align:center;">Sign in to dashboard</p>
 
-  <form id="loginForm">
-    <label>Email:</label><br>
-    <input id="email" type="email"><br><br>
+        <form id="loginForm">
+            <label>Email Address</label>
+            <input id="email" type="email" placeholder="admin@example.com" required>
 
-    <label>Password:</label><br>
-    <input id="password" type="password"><br><br>
+            <label>Password</label>
+            <input id="password" type="password" placeholder="••••••••" required>
 
-    <button type="submit">Login</button>
-    </form>
-
-    <pre id="result"></pre>
+            <button type="submit">Sign In</button>
+        </form>
+    </div>
 
     <script>
-    document.getElementById('loginForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            const originalText = btn.textContent;
+            btn.textContent = "Signing in..."; 
+            btn.disabled = true;
 
-    const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
 
-    const res = await fetch('/admin/login', {
-        method: 'POST',
-        headers: {"Content-Type":"application/json"},
-        body: JSON.stringify({ email, password })
-    });
-
-    const data = await res.json();
-    document.getElementById('result').textContent = JSON.stringify(data, null, 2);
-
-    if (data.success) window.location.href = "/adminDashboard.html";
-});
-</script>
+            try {
+                const res = await fetch('/admin/login', {
+                    method: 'POST',
+                    headers: {"Content-Type":"application/json"},
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await res.json();
+                
+                if (data.success) {
+                    window.location.href = "/adminDashboard.html";
+                } else {
+                    alert("Login failed: " + data.message);
+                    btn.textContent = originalText;
+                    btn.disabled = false;
+                }
+            } catch (error) {
+                alert("Connection Error");
+                btn.textContent = originalText;
+                btn.disabled = false;
+            }
+        });
+    </script>
 </body>
 </html>

@@ -1,43 +1,63 @@
 <!DOCTYPE html>
 <html>
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Register</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
 <body>
-    <h2>Admin Register</h2>
+    <div class="card">
+        <h2>New Admin</h2>
+        <p style="text-align:center;">Create administrative account</p>
 
-    <form id="registerForm">
-        <label>Nama:</label><br>
-        <input id="name"><br><br>
+        <form id="registerForm">
+            <label>Full Name</label>
+            <input id="name" type="text" placeholder="Steve Jobs" required>
 
-        <label>Email:</label><br>
-        <input id="email" type="email"><br><br>
+            <label>Email Address</label>
+            <input id="email" type="email" placeholder="admin@example.com" required>
 
-        <label>Password:</label><br>
-        <input id="password" type="password"><br><br>
+            <label>Password</label>
+            <input id="password" type="password" placeholder="••••••••" required>
 
-        <button type="submit">Register</button>
-    </form>
-
-    <pre id="result"></pre>
+            <button type="submit">Create Account</button>
+        </form>
+    </div>
 
     <script>
-    document.getElementById('registerForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            btn.textContent = "Creating...";
+            btn.disabled = true;
 
-    const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value.trim();
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
 
-    const res = await fetch('/admin/register', {
-        method: 'POST',
-        headers: {"Content-Type":"application/json"},
-        body: JSON.stringify({ 
-            name,
-            email, 
-            password    
-        })
-    });
+            try {
+                const res = await fetch('/admin/register', {
+                    method: 'POST',
+                    headers: {"Content-Type":"application/json"},
+                    body: JSON.stringify({ name, email, password })
+                });
 
-    const data = await res.json();
-    document.getElementById('result').textContent = JSON.stringify(data, null, 2);
-});
-</script>
+                const data = await res.json();
+                
+                if(data.success) {
+                    alert("Admin registered successfully!");
+                    window.location.href = "/adminLogin.html";
+                } else {
+                    alert("Register failed: " + data.message);
+                    btn.textContent = "Create Account";
+                    btn.disabled = false;
+                }
+            } catch (err) {
+                alert("Error connecting to server");
+                btn.textContent = "Create Account";
+                btn.disabled = false;
+            }
+        });
+    </script>
 </body>
 </html>

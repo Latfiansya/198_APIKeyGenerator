@@ -2,38 +2,75 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Cek API Key</title>
+    <title>Check API Key</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <div class="card">
+        <h1>API Validator</h1>
+        <p style="text-align:center;">Verify the status of an API Key</p>
 
-    <h1>Cek API Key</h1>
+        <label>Enter API Key</label>
+        <input id="apiKey" type="text" placeholder="Paste key here...">
 
-    <label>Masukkan API Key:</label><br>
-    <input id="apiKey" type="text"><br><br>
+        <button id="cekBtn">Validate Key</button>
 
-    <button id="cekBtn">Cek API</button>
+        <div id="statusResult"></div>
+        
+        <div style="margin-top: 24px;">
+            <a href="/index.html">&larr; Back to Generator</a>
+        </div>
+    </div>
 
-    <pre id="result"></pre>
+    <script>
+    const resultDiv = document.getElementById('statusResult');
+    const cekBtn = document.getElementById('cekBtn');
+    const inputField = document.getElementById('apiKey');
 
-<script>
-document.getElementById('cekBtn').addEventListener('click', async () => {
-    const apiKey = document.getElementById('apiKey').value.trim();
+    cekBtn.addEventListener('click', async () => {
+        const apiKey = inputField.value.trim();
 
-    if (!apiKey) {
-        alert("API key wajib diisi.");
-        return;
-    }
+        resultDiv.className = ''; 
+        resultDiv.innerHTML = '';
 
-    const res = await fetch('/cekapi', {
-        method: 'POST',
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ apiKey })
+        if (!apiKey) {
+            showStatus(false, "Please enter an API key first.");
+            return;
+        }
+
+        const originalText = cekBtn.textContent;
+        cekBtn.textContent = "Verifying...";
+        cekBtn.disabled = true;
+
+        try {
+            const res = await fetch('/cekapi', {
+                method: 'POST',
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ apiKey })
+            });
+
+            const data = await res.json();
+            showStatus(data.success, data.message || (data.success ? "API Key Valid" : "Invalid API Key"));
+
+        } catch (err) {
+            showStatus(false, "Connection error. Please try again.");
+        } finally {
+            cekBtn.textContent = originalText;
+            cekBtn.disabled = false;
+        }
     });
 
-    const data = await res.json();
-    document.getElementById('result').textContent = JSON.stringify(data, null, 2);
-});
-</script>
+    function showStatus(isSuccess, message) {
+        // HANYA TEKS, TIDAK ADA LOGO/SVG
+        resultDiv.textContent = message;
 
+        // Set warna background
+        resultDiv.className = `status-card ${isSuccess ? 'status-success' : 'status-error'}`;
+
+        setTimeout(() => {
+            resultDiv.classList.add('visible');
+        }, 10);
+    }
+    </script>
 </body>
 </html>

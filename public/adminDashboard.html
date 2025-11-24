@@ -1,24 +1,79 @@
 <!DOCTYPE html>
 <html>
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
 <body>
-    <h2>Admin Dashboard</h2>
+    <div class="card" style="max-width: 900px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+            <h2 style="margin:0;">User Management</h2>
+            <button id="loadBtn" style="width:auto; height:40px; margin:0; font-size:14px; padding:0 24px; border-radius: 20px;">Refresh Data</button>
+        </div>
 
-    <button id="loadBtn">Load Data User</button>
+        <div class="table-wrapper">
+            <table id="userTable">
+                <thead>
+                    <tr>
+                        <th style="width: 20%;">User</th>
+                        <th style="width: 25%;">Email</th>
+                        <th style="width: 40%;">API Key</th>
+                        <th style="width: 15%;">Status</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <tr><td colspan="4" style="padding: 30px; color: #888;">Loading data...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 
-    <pre id="output"></pre>
+    <script>
+    async function loadData() {
+        const tableBody = document.getElementById('tableBody');
+        const loadBtn = document.getElementById('loadBtn');
+        
+        loadBtn.textContent = "Loading...";
+        loadBtn.disabled = true;
 
-<script>
-async function loadData() {
-    const res = await fetch('/admin/dashboard');
-    const data = await res.json();
-    document.getElementById('output').textContent =
-        JSON.stringify(data, null, 2);
+        try {
+            const res = await fetch('/admin/dashboard');
+            const responseData = await res.json();
+            const users = responseData.data; 
+
+            tableBody.innerHTML = '';
+
+            if (!users || users.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="4" style="padding:30px;">No users found.</td></tr>';
+                return;
+            }
+
+            users.forEach(user => {
+                const isOnline = user.status === 'online';
+                const statusClass = isOnline ? 'badge-online' : 'badge-offline';
+
+                const row = `
+                    <tr>
+                        <td><div style="font-weight:600; color:#333;">${user.firstName} ${user.lastName}</div></td>
+                        <td>${user.email}</td>
+                        <td><span class="code-cell" title="${user.key}">${user.key}</span></td>
+                        <td><span class="badge ${statusClass}">${user.status}</span></td>
+                    </tr>
+                `;
+                tableBody.innerHTML += row;
+            });
+
+        } catch (err) {
+            tableBody.innerHTML = '<tr><td colspan="4" style="padding:30px; color:red;">Failed to load data.</td></tr>';
+        } finally {
+            loadBtn.textContent = "Refresh Data";
+            loadBtn.disabled = false;
+        }
     }
 
-// otomatis load saat halaman dibuka
-window.onload = loadData;
-
-document.getElementById('loadBtn').addEventListener('click', loadData);
-</script>
+    window.onload = loadData;
+    document.getElementById('loadBtn').addEventListener('click', loadData);
+    </script>
 </body>
 </html>
