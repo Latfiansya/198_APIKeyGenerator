@@ -5,87 +5,41 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Generate API Key</title>
   <script src="https://cdn.tailwindcss.com"></script>
+
   <style>
     body {
       background: radial-gradient(circle at 20% 20%, #1e1e2f, #111);
       color: white;
       font-family: 'Inter', sans-serif;
     }
-
     .glass {
       background: rgba(255, 255, 255, 0.08);
       backdrop-filter: blur(12px);
       border: 1px solid rgba(255, 255, 255, 0.15);
-      transition: background 0.3s ease;
     }
-
-    .glass:hover {
-      background: rgba(255, 255, 255, 0.12);
-    }
-
     .btn {
       background: linear-gradient(135deg, #6366f1, #8b5cf6);
-      transition: all 0.3s;
     }
-
-    .btn:hover {
-      background: linear-gradient(135deg, #4f46e5, #7c3aed);
-    }
-
-    /* Tombol Copy gaya ChatGPT */
-    .copy-btn {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 8px;
-      padding: 4px 8px;
-      font-size: 13px;
-      font-weight: 500;
-      color: #cfcfcf;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      opacity: 0;
-    }
-
-    .copy-container:hover .copy-btn {
-      opacity: 1;
-    }
-
-    .copy-btn:hover {
-      background: rgba(255, 255, 255, 0.2);
-      color: white;
-    }
-
     .code-box {
       background: #1e1e2f;
       border: 1px solid rgba(255, 255, 255, 0.15);
       border-radius: 10px;
       padding: 1rem;
-      position: relative;
-      text-align: left;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 0.9rem;
-      color: #e2e2e2;
-      overflow-x: auto;
-      min-height: 60px;
     }
   </style>
 </head>
+
 <body class="flex items-center justify-center min-h-screen p-4">
   <div class="glass rounded-2xl p-8 w-full max-w-md text-center relative">
-    <h1 class="text-2xl font-bold mb-3">Generate API Key</h1>
-    <p class="text-gray-300 mb-6 text-sm">
-      Klik tombol di bawah untuk membuat API key acak yang aman.
-    </p>
 
-    <!-- Kotak kode seperti ChatGPT -->
+    <h1 class="text-2xl font-bold mb-3">Generate API Key</h1>
+
     <div class="copy-container relative mb-4">
       <div id="apiKeyBox" class="code-box">
         <span id="apiKeyText" class="text-gray-400 italic">Belum ada API key</span>
       </div>
-      <button id="copyBtn" class="copy-btn">Copy API</button>
+      <button id="copyBtn" class="copy-btn absolute top-3 right-3">Copy</button>
     </div>
 
     <button id="generateBtn"
@@ -94,47 +48,120 @@
     </button>
 
     <p id="message" class="mt-4 text-sm opacity-0 transition-all duration-500"></p>
+
+    <!-- FORM USER -->
+    <div class="mt-8 text-left space-y-4">
+
+      <div>
+        <label>First Name</label>
+        <input id="firstName" class="w-full bg-gray-800 px-3 py-2 rounded mt-1" type="text">
+      </div>
+
+      <div>
+        <label>Last Name</label>
+        <input id="lastName" class="w-full bg-gray-800 px-3 py-2 rounded mt-1" type="text">
+      </div>
+
+      <div>
+        <label>Email</label>
+        <input id="email" class="w-full bg-gray-800 px-3 py-2 rounded mt-1" type="email">
+      </div>
+
+      <button id="saveBtn"
+        class="btn mt-4 w-full py-2 rounded-lg font-semibold text-white shadow-md opacity-50 cursor-not-allowed"
+        disabled>
+        Save User
+      </button>
+
+    </div>
   </div>
 
   <script>
     const generateBtn = document.getElementById('generateBtn');
+    const saveBtn = document.getElementById('saveBtn');
     const apiKeyText = document.getElementById('apiKeyText');
     const copyBtn = document.getElementById('copyBtn');
     const message = document.getElementById('message');
 
-    function generateApiKey(length = 32) {
-      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-      let key = 'sk-';
-      for (let i = 0; i < length; i++) {
-        key += chars.charAt(Math.floor(Math.random() * chars.length));
-      }
-      return key;
-    }
+    let currentApiKey = null;
 
-    generateBtn.addEventListener('click', () => {
-      const newKey = generateApiKey();
-      apiKeyText.textContent = newKey;
-      apiKeyText.classList.remove('text-gray-400', 'italic');
-
-      message.textContent = 'API key berhasil digenerate!';
-      message.classList.remove('text-red-400');
-      message.classList.add('t ext-green-400');
-      message.style.opacity = 1;
-      setTimeout(() => (message.style.opacity = 0), 2000);
-    });
-
-    copyBtn.addEventListener('click', async () => {
-      const key = apiKeyText.textContent.trim();
-      if (key === 'Belum ada API key') return;
-
+    // =============================
+    // 1. Generate API KEY via backend
+    // =============================
+    generateBtn.addEventListener('click', async () => {
       try {
-        await navigator.clipboard.writeText(key);
-        copyBtn.textContent = 'Copied!';
-        setTimeout(() => (copyBtn.textContent = 'Copy API'), 1500);
+        const res = await fetch('/create', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({})
+        });
+
+        const data = await res.json();
+        if (!data.success) {
+          alert(data.message);
+          return;
+        }
+
+        currentApiKey = data.apiKey;
+
+        apiKeyText.textContent = currentApiKey;
+        apiKeyText.classList.remove('text-gray-400', 'italic');
+
+        // enable SAVE button
+        saveBtn.disabled = false;
+        saveBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+
+        message.textContent = data.message;
+        message.style.opacity = 1;
       } catch (err) {
-        alert('Gagal menyalin API key.');
+        alert('Gagal generate API key.');
       }
     });
+
+    // =============================
+    // 2. Copy ke clipboard
+    // =============================
+    copyBtn.addEventListener('click', async () => {
+      if (!currentApiKey) return;
+      await navigator.clipboard.writeText(currentApiKey);
+      alert('Copied!');
+    });
+
+    // =============================
+    // 3. Save user
+    // =============================
+    saveBtn.addEventListener('click', async () => {
+      const firstName = document.getElementById('firstName').value.trim();
+      const lastName = document.getElementById('lastName').value.trim();
+      const email = document.getElementById('email').value.trim();
+
+      if (!firstName || !lastName || !email) {
+        alert('Semua field harus diisi.');
+        return;
+      }
+
+      const res = await fetch('/user/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          firstName,
+          lastName,
+          email,
+          apiKey: currentApiKey
+        })
+      });
+
+      const data = await res.json();
+
+      if (!data.success) {
+        alert(data.message);
+        return;
+      }
+
+      alert("User berhasil disimpan!");
+    });
+
   </script>
+
 </body>
 </html>
