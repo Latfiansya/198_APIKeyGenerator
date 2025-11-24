@@ -4,6 +4,9 @@
     <h2>Admin Register</h2>
 
     <form id="registerForm">
+        <label>Nama:</label><br>
+        <input id="name"><br><br>
+
         <label>Email:</label><br>
         <input id="email" type="email"><br><br>
 
@@ -25,7 +28,11 @@
     const res = await fetch('/admin/register', {
         method: 'POST',
         headers: {"Content-Type":"application/json"},
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ 
+            name,
+            email, 
+            password    
+        })
     });
 
     const data = await res.json();

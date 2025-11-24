@@ -3,7 +3,9 @@ const express = require('express');
 const path = require('path');
 const crypto = require('crypto');
 const sqlite3 = require('sqlite3').verbose();
+const bcrypt = require('bcryptjs');
 const hashPassword = require('./middleware/hashPassword');
+const verifyAdminCredentials = require('./middleware/verifyAdminCredentials');
 const app = express();
 
 const PORT = 3000;
@@ -66,12 +68,12 @@ app.get('/', (req, res) => {
 
 // ADMIN REGISTER
 app.post('/admin/register', hashPassword, (req, res) => {
-  const { email } = req.body;
+  const { email, name } = req.body;
   const hashedPassword = req.hashedPassword;
 
   db.run(
-    `INSERT INTO admin (email, password) VALUES (?, ?)`,
-    [email, hashedPassword],
+    `INSERT INTO admin (email, password, name) VALUES (?, ?, ?)`,
+    [email, hashedPassword, name],
     (err) => {
       if (err) {
         return res.status(500).json({ success: false, message: "Gagal daftar admin." });
@@ -82,8 +84,9 @@ app.post('/admin/register', hashPassword, (req, res) => {
 });
 
 
+
 // ADMIN LOGIN
-app.post('/admin/login', (req, res) => {
+app.post('/admin/login',verifyAdminCredentials, async (req, res) => {
   const { email, password } = req.body;
 
   db.get(`SELECT * FROM admin WHERE email = ?`, [email], async (err, admin) => {
